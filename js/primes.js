@@ -2,36 +2,50 @@ function Grapher(container){
     this.container = document.getElementById(container);
     this.ctx;
     this.pixelData;
+    this.pixel;
     this.finder = new PrimeFinder();
+    this.generator;
     
 
     this.init = function(){
         this.makeCanvas("base");
+        this.ctx.canvas.width = 1920;
+        this.ctx.canvas.height= 1080;
         this.pixelData = this.ctx.getImageData(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-       for(var i = 0; i < 20; i++){ 
-           var prime = this.finder.findNextPrime();
-           this.drawPixelPrime(prime);
-           console.log(prime);
-       }
+        this.pixel = this.ctx.getImageData(0,0,1,1);
+        this.generator = setInterval(function(){
+               var prime = this.finder.findNextPrime();
+               this.drawPixelPrime(prime);
+               console.log(prime);
+               this.maybeKillGenerator();
+       }.bind(this),0);
     };
+    this.maybeKillGenerator = function(){
+        if(this.finder.lastPrime >= this.ctx.canvas.height * this.ctx.canvas.width){
+            clearInterval(this.generator);
+        }
+    }
     this.makeCanvas = function(name){
         var canvas = document.createElement("canvas");
         this.container.appendChild(canvas);
         this.ctx = canvas.getContext("2d");
     };
     this.drawPixelPrime = function(num){
-        this.pixelData.data[(num*4)] = 255;
-        this.pixelData.data[(num*4) + 3] = 255;
-        this.ctx.putImageData(this.pixelData, 0, 0);
+        this.pixel.data[1] = 255; //green
+        this.pixel.data[3] = 255; //alpha
+        var x = num % this.ctx.canvas.width;
+        var y = (num/this.ctx.canvas.height) | 0;
+        this.ctx.putImageData(this.pixel, x, y);
+        //console.log(this.pixel);
     }
 }
 
-function PrimeFinder(){
+function PrimeFinder(totalPixels){
     this.lastPrime = 2;
     this.matchedPrimes = [this.lastPrime];
+    this.dontbother = Math.sqrt(totalPixels);
     
     this.findNextPrime = function(){
-        console.log(this.matchedPrimes);
         var prime = this.lastPrime;
         var nextPrime = 0;
         while(true){
@@ -49,7 +63,10 @@ function PrimeFinder(){
                 return false
             }
         }
-        this.matchedPrimes.push(num);
+        if(num > this.dontbother){}
+        else{
+            this.matchedPrimes.push(num);
+        }
         return true;
     }
 }

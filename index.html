@@ -1,0 +1,27 @@
+<html>
+<head>
+    <title>Prime numbers</title>
+    <script src="js/primes.js"></script>
+    <style>
+        #canvases{
+            position:relative;
+        }
+        #canvases canvas{
+            width:100%;
+            position:absolute;
+            top: 0;
+            left: 0;
+        }
+        #canvases canvas:first-child{
+            position:static;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvases"> </div>
+    <script>
+        var primes = new Grapher("canvases");
+        primes.init();
+    </script>
+</body>
+</html>

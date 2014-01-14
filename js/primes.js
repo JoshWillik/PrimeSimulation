@@ -58,9 +58,12 @@ function Grapher(container){
     };
     this.maybeKillGenerator = function(){
         if(this.finder.lastPrime >= this.ctx.canvas.height * this.ctx.canvas.width){
-            clearInterval(this.generator);
-            clearInterval(this.saver);
+            this.killGenerator();
         }
+    }
+    this.killGenerator = function(){
+        clearInterval(this.generator);
+        clearInterval(this.saver);
     }
     this.drawPixelPrime = function(num){
         num--;
@@ -78,7 +81,7 @@ function Grapher(container){
             this.drawPixelPrime(m[i]);
         }
         if(this.finder.lastPrime < this.ctx.canvas.height * this.ctx.canvas.width){
-            console.log("restarting");
+            this.killGenerator();
             this.startRender();
         }
     };

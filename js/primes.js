@@ -1,3 +1,28 @@
+(function(){
+    var noTimeFunction = [];
+    var messageName = "zero-timeout-hack";
+
+    //setTimeout with no 4-10ms enforced waittime
+    function zeroTimeout(fn){
+        noTimeFunction.push(fn);
+        window.postMessage(messageName, "*");
+    }
+
+    function handleMessage(event){
+        if(event.source == window && event.data == messageName){
+            event.stopPropagation();
+            if(noTimeFunction > 0){
+                var fn = noTimeFunction.shift();
+                fn();
+            }
+        }
+    }
+    
+    window.addEventListener("message", handleMessage, true);
+
+    window.zeroTimeout = zeroTimeout;
+})(); //^credit to David Baron for this beauty^
+
 function Grapher(container){
     this.container = document.getElementById(container);
     this.ctx;
@@ -58,7 +83,9 @@ function PrimeFinder(totalPixels){
         }
     }
     this.isPrime = function(num){
+        var square = Math.sqrt(num);
         for(var i in this.matchedPrimes){
+            if(this.matchedPrimes[i] > square) break;
             if(num % this.matchedPrimes[i] === 0){
                 return false
             }
@@ -66,7 +93,7 @@ function PrimeFinder(totalPixels){
         if(num > this.dontbother){}
         else{
             this.matchedPrimes.push(num);
-        }
         return true;
+        }
     }
 }

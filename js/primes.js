@@ -54,7 +54,7 @@ function Grapher(container){
        }.bind(this),0);
         this.saver = setInterval(function(){
             this.savePrimeData();
-        }.bind(this), 5000);
+        }.bind(this), 500);
     };
     this.maybeKillGenerator = function(){
         if(this.finder.lastPrime >= this.ctx.canvas.height * this.ctx.canvas.width){
@@ -83,7 +83,6 @@ function Grapher(container){
         }
     };
     this.savePrimeData = function(){
-        console.log(this.finder.matchedPrimes)
         if(localStorage) localStorage.setItem("primelist", JSON.stringify(this.finder.matchedPrimes));
         else return;
         console.log("prime data saved to localStorage");

@@ -30,17 +30,20 @@ function Grapher(container){
     this.pixel;
     this.finder = new PrimeFinder();
     this.generator;
+    this.saver;
     this.color = [0,255,0,255];
     
 
     this.init = function(){
+        this.finder.matchedPrimes = this.loadPrimeData();
+        this.finder.lastPrime = this.finder.matchedPrimes[this.finder.matchedPrimes.length -1];
         this.ctx.mozImageSmoothingEnabled = false;
         this.ctx.canvas.width = 1920;
         this.ctx.canvas.height= 1080;
         this.pixelData = this.ctx.getImageData(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.pixel = this.ctx.getImageData(0,0,1,1);
+        this.resize();
         this.drawPixelPrime(2);
-        this.startRender();
     };
     this.startRender = function(){
         this.generator = setInterval(function(){
@@ -49,10 +52,14 @@ function Grapher(container){
                //console.log(prime);
                this.maybeKillGenerator();
        }.bind(this),0);
+        this.saver = setInterval(function(){
+            this.savePrimeData();
+        }.bind(this), 5000);
     };
     this.maybeKillGenerator = function(){
         if(this.finder.lastPrime >= this.ctx.canvas.height * this.ctx.canvas.width){
             clearInterval(this.generator);
+            clearInterval(this.saver);
         }
     }
     this.drawPixelPrime = function(num){
@@ -75,6 +82,22 @@ function Grapher(container){
             this.startRender();
         }
     };
+    this.savePrimeData = function(){
+        console.log(this.finder.matchedPrimes)
+        if(localStorage) localStorage.setItem("primelist", JSON.stringify(this.finder.matchedPrimes));
+        else return;
+        console.log("prime data saved to localStorage");
+    }
+    this.loadPrimeData = function(){
+        var data;
+        if(localStorage) data = localStorage.getItem("primelist");
+        if(data === null) return [2];
+        if(data.length > 0){
+            return JSON.parse(data);
+        }else{
+            return [2];
+        }
+    }
 }
 
 function PrimeFinder(totalPixels){

@@ -24,24 +24,29 @@
 })(); //^credit to David Baron for this beauty^
 
 function Grapher(container){
-    this.container = document.getElementById(container);
-    this.ctx;
+    this.canv = document.getElementById(container);
+    this.ctx = this.canv.getContext("2d");
     this.pixelData;
     this.pixel;
     this.finder = new PrimeFinder();
     this.generator;
+    this.color = [0,255,0,255];
     
 
     this.init = function(){
-        this.makeCanvas("base");
+        this.ctx.mozImageSmoothingEnabled = false;
         this.ctx.canvas.width = 1920;
         this.ctx.canvas.height= 1080;
         this.pixelData = this.ctx.getImageData(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.pixel = this.ctx.getImageData(0,0,1,1);
+        this.drawPixelPrime(2);
+        this.startRender();
+    };
+    this.startRender = function(){
         this.generator = setInterval(function(){
                var prime = this.finder.findNextPrime();
                this.drawPixelPrime(prime);
-               console.log(prime);
+               //console.log(prime);
                this.maybeKillGenerator();
        }.bind(this),0);
     };
@@ -50,19 +55,26 @@ function Grapher(container){
             clearInterval(this.generator);
         }
     }
-    this.makeCanvas = function(name){
-        var canvas = document.createElement("canvas");
-        this.container.appendChild(canvas);
-        this.ctx = canvas.getContext("2d");
-    };
     this.drawPixelPrime = function(num){
-        this.pixel.data[1] = 255; //green
-        this.pixel.data[3] = 255; //alpha
+        num--;
+        this.pixel.data[0] = this.color[0]; //green
+        this.pixel.data[1] = this.color[1]; //green
+        this.pixel.data[2] = this.color[2]; //green
+        this.pixel.data[3] = this.color[3]; //alpha
         var x = num % this.ctx.canvas.width;
         var y = (num/this.ctx.canvas.height) | 0;
         this.ctx.putImageData(this.pixel, x, y);
-        //console.log(this.pixel);
     }
+    this.resize = function(){
+        var m = this.finder.matchedPrimes;
+        for(var i in m){
+            this.drawPixelPrime(m[i]);
+        }
+        if(this.finder.lastPrime < this.ctx.canvas.height * this.ctx.canvas.width){
+            console.log("restarting");
+            this.startRender();
+        }
+    };
 }
 
 function PrimeFinder(totalPixels){

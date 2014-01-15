@@ -3,6 +3,7 @@
 <head>
     <title>Prime numbers</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
     <script src="js/primes.js"></script>
     <style>
         html,body{margin:0;padding:0;}
@@ -102,6 +103,12 @@
         primes.init();
     </script>
     <script>
+        primes.ctx.canvas.width = window.innerWidth;
+        primes.ctx.canvas.height = window.innerHeight;
+
+        primes.resize();
+
+
         var lastTimeHeight, lastTimeWidth;
         function changeSize(e){
             var measure = this.getAttribute("data-target");

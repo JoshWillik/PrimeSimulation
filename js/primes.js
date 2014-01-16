@@ -1,28 +1,3 @@
-(function(){
-    var noTimeFunction = [];
-    var messageName = "zero-timeout-hack";
-
-    //setTimeout with no 4-10ms enforced waittime
-    function zeroTimeout(fn){
-        noTimeFunction.push(fn);
-        window.postMessage(messageName, "*");
-    }
-
-    function handleMessage(event){
-        if(event.source == window && event.data == messageName){
-            event.stopPropagation();
-            if(noTimeFunction > 0){
-                var fn = noTimeFunction.shift();
-                fn();
-            }
-        }
-    }
-    
-    window.addEventListener("message", handleMessage, true);
-
-    window.zeroTimeout = zeroTimeout;
-})(); //^credit to David Baron for this beauty^
-
 function Grapher(container){
     this.canv = document.getElementById(container);
     this.ctx = this.canv.getContext("2d");
